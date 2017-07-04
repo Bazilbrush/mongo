@@ -1,0 +1,83 @@
+db.stock.insert(
+	{
+	title: "Sports Illustrated Boob issue july 1986",
+	type: "magazine", 
+	yeah: 1985,
+	author: "Conde nast",
+	catno: "CNSPO85M"
+})
+db.rental.insert(
+	{
+	date: "04.07.2017",
+	catno: "OWCIT41F",
+	out_til: "21.07.2017", 
+	rentby: "James Dean"
+	
+})
+
+
+db.restaurants.find(
+	{$and:[
+	{borough:"Queens"},
+	{cuisine: "Italian"}]}
+)
+the top 2 documents in the collection that have the highest score value in the grades embedded document
+db.restaurants.aggregate([
+	{
+		"maxGrade": {$max:"$grades.score"}
+	}
+	])
+l
+db.restaurants.find(
+	{},
+	{"grades.score":1}).sort({"grades.score":-1}).limit(2)
+	
+
+db.stock.find(
+	{
+	"rental.rentby": "Jimmy Saville"},
+	{title:1})
+
+
+db.stock.aggregate([
+	{
+		$lookup: {
+			from: "stock",
+			localField: "catno",
+			foreignField: "catno",
+			as: "title"
+			}
+	},
+	{
+		$unwind: "$title"
+	},
+	{
+		$lookup: {
+			from: "rental",
+			localField: "catno",
+			foreignField: "catno",
+			as: "name"
+			}
+	},
+	{
+		$unwind: "$name"
+	}
+])
+db.rental.aggregate([
+	{ 
+	$match: { rentby : "James Dean"}
+	},
+	
+	{
+		$lookup: {
+			from: "stock",
+			localField: "catno",
+			foreignField: "catno",
+			as: "name"
+			}
+	},
+	{
+		$unwind: "$name"
+	}
+		
+]);
